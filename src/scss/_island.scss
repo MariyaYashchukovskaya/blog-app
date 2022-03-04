@@ -5,40 +5,23 @@ $component: 'island';
   background-color: white;
   margin-bottom: 1rem;
 
-
-
   &__item {
     padding: 0.5rem;
-    background-color:grey;
+    background-color: grey;
 
+    &_active {
+      background-color: hotpink;
+    }
 
     h4,
     time {
       pointer-events: none;
     }
 
-
-
-      &.active{
-        background-color:hotpink;
-    }
-
   }
-
-
 
   &__item+&__item {
     border-top: 1px solid lightgrey;
-
-
   }
 
-
-
-
-
 }
-
-
-
-

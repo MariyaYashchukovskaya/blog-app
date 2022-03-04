@@ -2,7 +2,7 @@ class Posts {
   constructor (containerElement) {
     this.containerElement = containerElement
     this.baseUrl = '/api/posts'
-
+    this.activeElement = null
     this.init()
   }
 
@@ -10,13 +10,6 @@ class Posts {
     document.addEventListener('DOMContentLoaded', this.handleDOMReady.bind(this))
     window.addEventListener('form.sent', this.handleDataSent.bind(this))
     this.containerElement.addEventListener('click', this.handlePostSend.bind(this))
-    this.containerElement.addEventListener('click', this.handlePostShow.bind(this))
-  }
-
-  handlePostShow (event) {
-    const { target } = event
-
-    target.classList.add('active')
   }
 
   handlePostSend (event) {
@@ -24,6 +17,11 @@ class Posts {
     const { id } = target.dataset
 
     if (target.dataset.role !== 'edit') return
+
+    const listItemElement = target.closest('.island__item')
+    if (listItemElement) {
+      this.toggleActiveListElement(listItemElement)
+    }
 
     fetch(`${this.baseUrl}/${id}`)
       .then(response => response.json())
@@ -33,6 +31,14 @@ class Posts {
         })
         window.dispatchEvent(eventCustom)
       })
+  }
+
+  toggleActiveListElement (listItemElement) {
+    if (this.activeElement) {
+      this.activeElement.classList.remove('island__item_active')
+    }
+    listItemElement.classList.add('island__item_active')
+    this.activeElement = listItemElement
   }
 
   handleDOMReady () {

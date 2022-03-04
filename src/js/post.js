@@ -11,7 +11,6 @@ class Post {
 
   handlePostClicked ({ detail }) {
     const { data } = detail
-
     this.render(data)
   }
 
@@ -58,7 +57,6 @@ class Post {
 
   render (data) {
     const templates = this.buildTemplate(data)
-
     this.containerElement.innerHTML = templates
   }
 }
