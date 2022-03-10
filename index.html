@@ -12,10 +12,15 @@
   <div class="container">
     <div class="island d-flex align-items-center">
       <h2>Blog</h2>
-      <button class="btn btn-primary ms-auto" data-bs-toggle="modal" data-bs-target="#formModal">Создать</button>
+      <button class="btn btn-primary ms-auto" id="buttonCreatePost">Создать</button>
     </div>
-    <div class="row" style="min-height: 460px ;">
 
+    <div id="searchForm" class="island d-flex flex-column align-items-center">
+      <h5>Поиск по заголовку</h5>
+      <input type="text" id="search" class="form-control island__item_search w-100" placeholder="Поиск по заголовку...">
+    </div>
+
+    <div class="row" style="min-height: 460px ;">
       <div class="col-4">
         <div class="island h-100" id="posts">
         </div>
@@ -34,32 +39,34 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+          <h5 class="modal-title" id="exampleModalLabel">Создайте пост</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
 
 
-          <form id="form">
+          <form id="form" data-method="POST">
+            <input type="hidden" name="id">
+            <input type="hidden" name="createdAt">
             <div class="mb-3">
-            <select class="form-select" aria-label="Default select example" id="select" name="select">
-              <option selected>Тип статьи</option>
-              <option value="1">Спорт</option>
-              <option value="2">Туризм</option>
-              <option value="3">Бизнес</option>
-            </select>
-          </div>
+              <select class="form-select" aria-label="Default select example" id="select" name="select">
+                <option selected>Тип статьи</option>
+                <option value="1">Спорт</option>
+                <option value="2">Туризм</option>
+                <option value="3">Бизнес</option>
+              </select>
+            </div>
             <div class="mb-3">
               <label for="title" class="form-label">Заголовок</label>
-              <input type="text" class="form-control" id="title" name="title">
+              <input type="text" class="form-control" id="title" name="title" required>
             </div>
             <div class="mb-3">
               <label for="content" class="form-label">Содержимое</label>
-              <textarea class="form-control" id="content" rows="3" name="content"></textarea>
+              <textarea class="form-control" id="content" rows="3" name="content" required></textarea>
             </div>
             <div class="mb-3">
-              <label for="title" class="form-label">Автор</label>
-              <input type="text" class="form-control" id="author" name="author">
+              <label for="author" class="form-label">Автор</label>
+              <input type="text" class="form-control" id="author" name="author" required>
             </div>
 
             <button type="submit" class="btn btn-primary">Создать</button>
@@ -67,9 +74,42 @@
 
 
 
+
+
+
+
         </div>
       </div>
     </div>
+    <template id="templatePosts">
+      <div class="island__item" data-id="{{id}}" data-role="clicked">
+        <h4>{{title}}</h4>
+        <time class="text-muted">{{createdAt}}</time>
+      </div>
+    </template>
+
+    <template id="template">
+      <div class="island__item" data-id="{{id}}">
+        <h2 class="text-center">{{title}}</h2>
+        <p class="text-center" style="min-height: 100px;">{{content}}</p>
+        <div class="d-flex justify-content-end" id="selectType">{{select}}</div>
+        <div class="d-flex justify-content-between">
+        <p>Автор:{{author}}</p>
+        <time class="text-muted">{{createdAt}}</time>
+      </div>
+
+
+        <div class="mt-4">
+          <button class="btn edit" data-role="edit">Редактировать</button>
+          <button class="btn remove" data-role="remove">Удалить</button>
+        </div>
+    </template>
+
+  </div>
+
+
+
+
   </div>
 
 

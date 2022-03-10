@@ -2,15 +2,18 @@ $component: 'island';
 
 .#{$component} {
   border-radius: 0.5rem;
-  background-color: white;
+  background-color: #e0b9ca;
   margin-bottom: 1rem;
+  padding: 0.5rem;
+  display: block;
 
   &__item {
     padding: 0.5rem;
-    background-color: grey;
+
 
     &_active {
-      background-color: hotpink;
+      background-color: #a96d8e;
+      border-radius: 0.5rem;
     }
 
     h4,
@@ -23,5 +26,22 @@ $component: 'island';
   &__item+&__item {
     border-top: 1px solid lightgrey;
   }
+
+  button {
+    background-color: #bbcacc;
+    border: 1px solid #a8b6b8;
+    color: black;
+  }
+  .remove{
+    background-color: #7e3d4a;
+    border: 1px solid #7e3d4a;
+    color: #e2c9c3;
+  }
+  .edit{
+    background-color: #e2c9c3;
+    border: 1px solid #7e3d4a94;
+    color: black;
+  }
+
 
 }

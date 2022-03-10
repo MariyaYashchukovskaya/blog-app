@@ -1,8 +1,12 @@
+import { buildDate } from './transform-data'
 class Posts {
   constructor (containerElement) {
     this.containerElement = containerElement
     this.baseUrl = '/api/posts'
     this.activeElement = null
+    this.templateElement = document.querySelector('#templatePosts')
+    this.titleSearch = ''
+    this.inputFilterElement = document.querySelector('#search')
     this.init()
   }
 
@@ -10,26 +14,26 @@ class Posts {
     document.addEventListener('DOMContentLoaded', this.handleDOMReady.bind(this))
     window.addEventListener('form.sent', this.handleDataSent.bind(this))
     this.containerElement.addEventListener('click', this.handlePostSend.bind(this))
+    window.addEventListener('post.removed', this.handlePostRemove.bind(this))
+    this.inputFilterElement.addEventListener('input', this.handlePostFilter.bind(this))
   }
 
   handlePostSend (event) {
     const { target } = event
     const { id } = target.dataset
-
-    if (target.dataset.role !== 'edit') return
+    if (target.dataset.role !== 'clicked') return
 
     const listItemElement = target.closest('.island__item')
     if (listItemElement) {
       this.toggleActiveListElement(listItemElement)
     }
-
     fetch(`${this.baseUrl}/${id}`)
       .then(response => response.json())
       .then(data => {
-        const eventCustom = new CustomEvent('post.clicked', {
+        const customEvent = new CustomEvent('post.clicked', {
           detail: { data }
         })
-        window.dispatchEvent(eventCustom)
+        window.dispatchEvent(customEvent)
       })
   }
 
@@ -41,6 +45,11 @@ class Posts {
     this.activeElement = listItemElement
   }
 
+  handlePostRemove (event) {
+    const { data } = event.detail
+    this.render(data.list)
+  }
+
   handleDOMReady () {
     fetch(this.baseUrl)
       .then(response => response.json())
@@ -50,33 +59,36 @@ class Posts {
       })
   }
 
+  handlePostFilter (event) {
+    const { target } = event
+    const searchString = target.value
+    const matches = this.titleSearch.filter((item) => item.title.includes(searchString))
+    console.log(matches)
+    this.render(matches)
+  }
+
   handleDataSent ({ detail }) {
     const { data } = detail
-
+    this.titleSearch = data.list
     this.render(data.list)
   }
 
   buildTemplate (data) {
-    const date = new Date(data.createdAt)
-    const dateCreateAt = this.buildDate(date)
+    let template = this.templateElement.innerHTML
+    const date = buildDate(data.createdAt)
+    template = template.replaceAll('{{createdAt}}', date)
+    for (const key in data) {
+      template = template.replaceAll(`{{${key}}}`, data[key])
+    }
+    return template
 
-    return `
-    <div class="island__item" data-id="${data.id}" data-role="edit">
-    <h4>${data.title}</h4>
-    <time class="text-muted">${dateCreateAt}</time>
-    </div>
-    `
-  }
-
-  buildDate (data) {
-    const day = this.transformData(data.getDate())
-    const month = this.transformData(data.getMonth() + 1)
-    const year = data.getFullYear()
-    return `${day}.${month}.${year}`
-  }
-
-  transformData (time) {
-    return time < 10 ? `0${time}` : time
+    // const date = buildDate(data.createdAt)
+    // return `
+    // <div class="island__item" data-id="${data.id}" data-role="clicked">
+    // <h4>${data.title}</h4>
+    // <time class="text-muted">${date}</time>
+    // </div>
+    // `
   }
 
   render (data) {
