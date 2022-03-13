@@ -1,5 +1,6 @@
-import { buildDate, selectTypePost } from './transform-data'
-
+import { marked } from 'marked'
+import { template } from 'lodash'
+import { selectTypePost } from './transform-data'
 class Post {
   constructor (containerElement) {
     this.containerElement = containerElement
@@ -20,29 +21,30 @@ class Post {
   handlePostClicked ({ detail }) {
     const { data } = detail
     this.currentPost = data
+
     this.url = `${this.baseUrl}/${data.id}`
     this.render(data)
   }
 
-  handleClickButtonRemove (event) {
+  async handleClickButtonRemove (event) {
     const { role } = event.target.dataset
     if (role === 'remove') {
-      fetch(this.url, {
+      const response = await fetch(this.url, {
         method: 'DELETE'
       })
-        .then(response => response.json())
-        .then(data => {
-          const customEvent = new CustomEvent('post.removed', {
-            detail: { data }
-          })
-          window.dispatchEvent(customEvent)
-          this.containerElement.innerHTML = ''
-        })
+      const data = await response.json()
+
+      const customEvent = new CustomEvent('post.removed', {
+        detail: { data }
+      })
+      window.dispatchEvent(customEvent)
+      this.containerElement.innerHTML = ''
     }
   }
 
   handlePostEdited ({ detail }) {
     const { post } = detail
+
     this.render(post)
   }
 
@@ -52,35 +54,22 @@ class Post {
       const customEvent = new CustomEvent('post.edit', {
         detail: { data: this.currentPost }
       })
+
       window.dispatchEvent(customEvent)
     }
   }
 
   buildTemplate (data) {
-    let template = this.templateElement.innerHTML
-    const typeSelect = selectTypePost(data.select)
-    template = template.replaceAll('{{select}}', typeSelect)
-    const date = buildDate(data.createdAt)
-    template = template.replaceAll('{{createdAt}}', date)
-    for (const key in data) {
-      template = template.replaceAll(`{{${key}}}`, data[key])
-    }
-    return template
-    // const typePost = selectTypePost(data.select)
-    // const dateCreateAt = buildDate(data.createdAt)
-    // return `
-    // <div class="island__item" data-id="${data.id}">
-    // <h4>${data.title}</h4>
-    // <p>${data.content}</p>
-    // <p>${data.author}</p>
-    // <p>${typePost}</p>
-    // <time class="text-muted">${dateCreateAt}</time>
-    // </div>
-    // <div class="mt-4">
-    //     <button class="btn btn-warning" data-role="edit">Редактировать</button>
-    //     <button class="btn btn-danger" data-role="remove">Удалить</button>
-    //   </div>
-    // `
+    const templateHtml = this.templateElement.innerHTML
+
+    data.selectType = selectTypePost(data.select)
+    console.log(data)
+    data.html = marked.parse(data.contentMd)
+
+    const compiled = template(templateHtml)
+    const result = compiled(data)
+
+    return result
   }
 
   render (data) {

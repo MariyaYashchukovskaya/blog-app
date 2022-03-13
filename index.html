@@ -39,7 +39,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Создайте пост</h5>
+          <h5 class="modal-title" id="exampleModalLabel">Создать/редактировать пост</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -48,6 +48,8 @@
           <form id="form" data-method="POST">
             <input type="hidden" name="id">
             <input type="hidden" name="createdAt">
+            <input type="hidden" name="html">
+            <input type="hidden" name="selectType">
             <div class="mb-3">
               <select class="form-select" aria-label="Default select example" id="select" name="select">
                 <option selected>Тип статьи</option>
@@ -61,43 +63,37 @@
               <input type="text" class="form-control" id="title" name="title" required>
             </div>
             <div class="mb-3">
-              <label for="content" class="form-label">Содержимое</label>
-              <textarea class="form-control" id="content" rows="3" name="content" required></textarea>
+              <label for="contentMd" class="form-label">Содержимое</label>
+              <textarea class="form-control" id="contentMd" rows="3" name="contentMd" required></textarea>
             </div>
             <div class="mb-3">
               <label for="author" class="form-label">Автор</label>
               <input type="text" class="form-control" id="author" name="author" required>
             </div>
 
-            <button type="submit" class="btn btn-primary">Создать</button>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+
           </form>
-
-
-
-
-
-
 
         </div>
       </div>
     </div>
     <template id="templatePosts">
-      <div class="island__item" data-id="{{id}}" data-role="clicked">
-        <h4>{{title}}</h4>
-        <time class="text-muted">{{createdAt}}</time>
+      <div class="island__item" data-id="${id}" data-role="clicked">
+        <h4>${title}</h4>
+        <time class="text-muted">${createdAt}</time>
       </div>
     </template>
 
     <template id="template">
-      <div class="island__item" data-id="{{id}}">
-        <h2 class="text-center">{{title}}</h2>
-        <p class="text-center" style="min-height: 100px;">{{content}}</p>
-        <div class="d-flex justify-content-end" id="selectType">{{select}}</div>
+      <div class="island__item" data-id="${id}">
+        <h2 class="text-center">${title}</h2>
+        <p class="text-center" style="min-height: 100px;">${html}</p>
+        <div class="d-flex justify-content-end" id="selectType">${selectType}</div>
         <div class="d-flex justify-content-between">
-        <p>Автор:{{author}}</p>
-        <time class="text-muted">{{createdAt}}</time>
-      </div>
-
+          <p>Автор:${author}</p>
+          <time class="text-muted">${createdAt}</time>
+        </div>
 
         <div class="mt-4">
           <button class="btn edit" data-role="edit">Редактировать</button>
@@ -107,12 +103,6 @@
 
   </div>
 
-
-
-
   </div>
-
-
 </body>
-
 </html>

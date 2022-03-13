@@ -1,4 +1,5 @@
-import { buildDate } from './transform-data'
+import { template } from 'lodash'
+
 class Posts {
   constructor (containerElement) {
     this.containerElement = containerElement
@@ -18,7 +19,7 @@ class Posts {
     this.inputFilterElement.addEventListener('input', this.handlePostFilter.bind(this))
   }
 
-  handlePostSend (event) {
+  async handlePostSend (event) {
     const { target } = event
     const { id } = target.dataset
     if (target.dataset.role !== 'clicked') return
@@ -27,14 +28,13 @@ class Posts {
     if (listItemElement) {
       this.toggleActiveListElement(listItemElement)
     }
-    fetch(`${this.baseUrl}/${id}`)
-      .then(response => response.json())
-      .then(data => {
-        const customEvent = new CustomEvent('post.clicked', {
-          detail: { data }
-        })
-        window.dispatchEvent(customEvent)
-      })
+    const response = await fetch(`${this.baseUrl}/${id}`)
+    const data = await response.json()
+
+    const customEvent = new CustomEvent('post.clicked', {
+      detail: { data }
+    })
+    window.dispatchEvent(customEvent)
   }
 
   toggleActiveListElement (listItemElement) {
@@ -74,28 +74,16 @@ class Posts {
   }
 
   buildTemplate (data) {
-    let template = this.templateElement.innerHTML
-    const date = buildDate(data.createdAt)
-    template = template.replaceAll('{{createdAt}}', date)
-    for (const key in data) {
-      template = template.replaceAll(`{{${key}}}`, data[key])
-    }
-    return template
-
-    // const date = buildDate(data.createdAt)
-    // return `
-    // <div class="island__item" data-id="${data.id}" data-role="clicked">
-    // <h4>${data.title}</h4>
-    // <time class="text-muted">${date}</time>
-    // </div>
-    // `
+    const templateHtml = this.templateElement.innerHTML
+    const compiled = template(templateHtml)
+    const result = compiled(data)
+    return result
   }
 
   render (data) {
     const templates = data.map(item => {
       return this.buildTemplate(item)
     })
-
     this.containerElement.innerHTML = templates.join('')
   }
 }

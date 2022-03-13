@@ -1,6 +1,7 @@
 import { nanoid } from 'nanoid'
 import { Modal } from 'bootstrap'
 import { resetForm } from './helpers'
+import { buildDate } from './transform-data'
 
 class Form {
   constructor (formElement) {
@@ -25,9 +26,13 @@ class Form {
 
   handleFormSubmit (event) {
     event.preventDefault()
+    const date = new Date()
+    const transformDate = buildDate(date)
+
     const post = {
       id: nanoid(),
-      createdAt: new Date()
+      createdAt: transformDate,
+      selectType: ''
     }
 
     const formData = new FormData(this.formElement)
@@ -42,40 +47,49 @@ class Form {
     resetForm(this.formElement)
   }
 
-  sendData (post) {
+  async sendData (post) {
     const json = JSON.stringify(post)
-    const { method } = this.formElement.dataset
-    this.currentDataEdit = post
+    const {
+      method
+    } = this.formElement.dataset
     let url = this.baseUrl
     if (method === 'PUT') {
+      this.currentDataEdit = post
       url = `${url}/${post.id}`
       const customEvent = new CustomEvent('post.edited', {
-        detail: { post }
+        detail: {
+          post
+        }
       })
       window.dispatchEvent(customEvent)
     }
 
-    fetch(url, {
+    const response = await fetch(url, {
       method,
       body: json,
       headers: {
         'Content-Type': 'application/json'
       }
     })
-      .then(response => response.json())
-      .then(data => {
-        const event = new CustomEvent('form.sent', {
-          detail: { data }
-        })
-        window.dispatchEvent(event)
-      })
+
+    const data = await response.json()
+    const event = new CustomEvent('form.sent', {
+      detail: {
+        data
+      }
+    })
+    window.dispatchEvent(event)
   }
 
   handlePostEdit (event) {
     resetForm(this.formElement)
     this.instanceModal.show()
     this.formElement.setAttribute('data-method', 'PUT')
-    const { data } = event.detail
+    const {
+      data
+    } = event.detail
+    console.log(data)
+    console.log(this.currentDataEdit)
 
     if (data.id === this.currentDataEdit.id) {
       for (const key in this.currentDataEdit) {
@@ -86,7 +100,6 @@ class Form {
         this.formElement.querySelector(`[name="${key}"]`).value = data[key]
       }
     }
-    console.log(this.currentDataEdit)
   }
 
   handleClickButtonCreatePost () {
