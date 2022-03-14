@@ -52,7 +52,6 @@ class Posts {
 
   async handleDOMReady () {
     const response = await fetch(this.baseUrl)
-
     const data = await response.json()
     const { list } = data
     this.render(list)
@@ -68,8 +67,8 @@ class Posts {
 
   handleDataSent ({ detail }) {
     const { data } = detail
-    this.titleSearch = data.list
     this.render(data.list)
+    this.titleSearch = data.list
   }
 
   buildTemplate (data) {
