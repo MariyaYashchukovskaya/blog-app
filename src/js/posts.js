@@ -50,13 +50,12 @@ class Posts {
     this.render(data.list)
   }
 
-  handleDOMReady () {
-    fetch(this.baseUrl)
-      .then(response => response.json())
-      .then(data => {
-        const { list } = data
-        this.render(list)
-      })
+  async handleDOMReady () {
+    const response = await fetch(this.baseUrl)
+
+    const data = await response.json()
+    const { list } = data
+    this.render(list)
   }
 
   handlePostFilter (event) {
